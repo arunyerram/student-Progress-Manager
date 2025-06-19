@@ -5,9 +5,16 @@ Built with **React**, **Node.js**, **Express**, and **MongoDB**.
 Designed for easy management of multiple students, including automated reminders and detailed analytics.
 
 Deployed Link: https://poetic-shortbread-a057ee.netlify.app/
+
+
+
 Video's Link:
 https://www.loom.com/share/50b4bf0f50e4416a99b8e4503c72ab17?sid=08ffed10-1fbe-428f-8029-d7f48bc0a6f7
 https://www.loom.com/share/5676d77fe9174cb3a77c4e3188263b52?sid=77636fbe-13f1-4600-84a4-2c38ca3cc7d9
+
+
+
+
 
 ---
 
@@ -148,6 +155,3 @@ student-Progress-Manager/
 👨‍💻 Contributors
 https://github.com/arunyerram
 
-🎥 Video Demo
-https://www.loom.com/share/50b4bf0f50e4416a99b8e4503c72ab17?sid=08ffed10-1fbe-428f-8029-d7f48bc0a6f7
-https://www.loom.com/share/5676d77fe9174cb3a77c4e3188263b52?sid=77636fbe-13f1-4600-84a4-2c38ca3cc7d9
