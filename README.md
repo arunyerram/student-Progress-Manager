@@ -141,7 +141,7 @@ student-Progress-Manager/
 
 
 👨‍💻 Contributors
-Arun Yerram (GitHub)
+[Arun Yerram (GitHub)](https://github.com/arunyerram)
 
 🎥 Video Demo
 Attach or link your screen-recorded video here.
