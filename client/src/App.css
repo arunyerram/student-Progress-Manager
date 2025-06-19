@@ -1,0 +1,194 @@
+.heatmap-container {
+  max-width: 550px;
+  margin: 0 auto 24px auto;
+}
+
+.react-calendar-heatmap text {
+  font-size: 10px;
+  fill: #777;
+}
+
+.react-calendar-heatmap .react-calendar-heatmap-weekday-label {
+  font-size: 11px;
+}
+
+.react-calendar-heatmap .react-calendar-heatmap-month-label {
+  font-size: 16px;
+  fill: #aaa;
+}
+
+.react-calendar-heatmap rect {
+  stroke: #fff;
+  stroke-width: 1;
+  rx: 2;
+  ry: 2;
+}
+
+.color-empty { fill: #eee; }
+.color-github-1 { fill: #9be9a8; }
+.color-github-2 { fill: #40c463; }
+.color-github-3 { fill: #30a14e; }
+.color-github-4 { fill: #216e39; }
+
+.react-calendar-heatmap rect:hover {
+  stroke: #333;
+  stroke-width: 2;
+}
+
+@media (max-width: 600px) {
+  .heatmap-container {
+    max-width: 99vw !important;
+    min-width: 0;
+    padding: 0;
+  }
+  .react-calendar-heatmap {
+    min-width: 0;
+  }
+}
+
+body.dark-theme, .dark {
+  background: #181a20 !important;
+  color: #e6e6e6 !important;
+}
+
+.app-container.dark,
+.dark table,
+.dark input,
+.dark select,
+.dark .react-calendar-heatmap,
+.dark .recharts-wrapper,
+.dark .heatmap-container {
+  background: #23272f !important;
+  color: #e6e6e6 !important;
+}
+
+.dark table {
+  border-color: #444;
+}
+
+.dark th, .dark td {
+  background: #23272f !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+.dark input, .dark select {
+  background: #181a20 !important;
+  color: #eee !important;
+  border: 1px solid #333;
+}
+
+.dark .recharts-wrapper text {
+  fill: #eee !important;
+}
+
+.dark .react-calendar-heatmap rect {
+  stroke: #444;
+}
+
+
+/* Settings card improvements for dark mode */
+.dark .settings-card,
+body.dark-theme .settings-card {
+  background: #23272f !important;
+  color: #eee !important;
+  box-shadow: 0 2px 16px #0005;
+}
+
+.dark .settings-card input {
+  background: #181a20 !important;
+  color: #eee !important;
+  border: 1px solid #333;
+}
+
+.dark .settings-card button {
+  background: #222 !important;
+  color: #eee !important;
+}
+
+.dark .settings-card a {
+  color: #aeeaff !important;
+}
+
+.dark .settings-card code,
+.dark .settings-card ul {
+  color: #aadfff !important;
+}
+
+.dark .settings-card label,
+.dark .settings-card p,
+.dark .settings-card b {
+  color: #eee !important;
+}
+
+
+
+/* App.css or your main CSS file */
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.responsive-table-wrapper {
+  overflow-x: auto;
+  max-width: 100vw;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 700px;
+  background: var(--table-bg, #fff);
+}
+
+th, td {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+@media (max-width: 800px) {
+  .responsive-table-wrapper,
+  .heatmap-container {
+    max-width: 100vw;
+    padding: 0 2px;
+  }
+  table {
+    min-width: 600px;
+    font-size: 0.93rem;
+  }
+  th, td {
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  .responsive-table-wrapper,
+  .heatmap-container {
+    max-width: 100vw;
+    padding: 0 1px;
+  }
+  table {
+    min-width: 420px;
+    font-size: 0.85rem;
+  }
+  th, td {
+    padding: 6px 4px;
+  }
+  h2, h3 {
+    font-size: 1.1rem;
+  }
+}
+
+button, select {
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  padding: 6px 13px;
+  background: var(--btn-bg, #f4f4f4);
+  transition: background .2s;
+}
+
+button:active {
+  background: #dedede;
+}
