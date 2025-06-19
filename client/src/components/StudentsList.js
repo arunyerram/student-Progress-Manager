@@ -19,7 +19,7 @@ export default function StudentsList() {
   async function fetchStudents() {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/students');
+      const res = await fetch('https://student-progress-manager-2.onrender.com/api/students');
       const data = await res.json();
       setStudents(data);
     } catch (err) {
@@ -32,7 +32,8 @@ export default function StudentsList() {
     if (!window.confirm("Are you sure you want to delete this student?")) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}`, { method: 'DELETE' });
+      const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}`,
+         { method: 'DELETE' });
       if (!res.ok) throw new Error("Failed to delete");
       setStudents(prev => prev.filter(s => s._id !== id));
     } catch (err) {
@@ -55,7 +56,8 @@ export default function StudentsList() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${_id}`, {
+      const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${_id}`,
+         {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, codeforcesHandle })
@@ -80,7 +82,8 @@ export default function StudentsList() {
       <h2>Student Progress Manager</h2>
 
       <button
-        onClick={() => window.open('http://localhost:5000/api/students/export', '_blank')}
+        onClick={() => window.open('https://student-progress-manager-2.onrender.com/api/students/export',
+           '_blank')}
         style={{ marginRight: '1rem' }}
       >Download CSV</button>
       <Link to="/add">

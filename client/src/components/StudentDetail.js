@@ -41,7 +41,7 @@ export default function StudentDetail() {
 
   // Fetch a single student (for reset count)
   async function fetchStudent() {
-    const res = await fetch(`http://localhost:5000/api/students/${id}`);
+    const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}`);
     if (res.ok) setStudent(await res.json());
   }
 
@@ -51,9 +51,9 @@ export default function StudentDetail() {
     setLoading(true);
     try {
       const [stuRes, contRes, probRes] = await Promise.all([
-        fetch(`http://localhost:5000/api/students/${id}`),
-        fetch(`http://localhost:5000/api/students/${id}/contests?days=${contestDays}`),
-        fetch(`http://localhost:5000/api/students/${id}/problems?days=${problemDays}`)
+        fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}`),
+        fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/contests?days=${contestDays}`),
+        fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/problems?days=${problemDays}`)
       ]);
       if (!stuRes.ok) throw new Error('Failed to fetch student');
       const stuJson  = await stuRes.json();
@@ -75,7 +75,7 @@ export default function StudentDetail() {
   // Re-fetch contests/problems on filter change
   useEffect(() => {
     if (!student) return;
-    fetch(`http://localhost:5000/api/students/${id}/contests?days=${contestDays}`)
+    fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/contests?days=${contestDays}`)
       .then(r => r.ok ? r.json() : [])
       .then(setContests)
       .catch(console.error);
@@ -83,7 +83,7 @@ export default function StudentDetail() {
 
   useEffect(() => {
     if (!student) return;
-    fetch(`http://localhost:5000/api/students/${id}/problems?days=${problemDays}`)
+    fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/problems?days=${problemDays}`)
       .then(r => r.ok ? r.json() : [])
       .then(setProblems)
       .catch(console.error);
@@ -91,7 +91,7 @@ export default function StudentDetail() {
 
   // Fetch most difficult problem
   useEffect(() => {
-    fetch(`http://localhost:5000/api/students/${id}/most-difficult-problem?days=90`)
+   fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/most-difficult-problem?days=90`)
       .then(r => r.json())
       .then(setMostDifficult)
       .catch(() => setMostDifficult(null));
@@ -101,7 +101,8 @@ export default function StudentDetail() {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}/sync`, { method: 'POST' });
+      const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/sync`,
+         { method: 'POST' });
       if (!res.ok) throw new Error('Sync failed');
       await loadAll();
     } catch (e) {
@@ -116,7 +117,7 @@ export default function StudentDetail() {
     setReminderLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/students/${student._id}/reminder`,
+       `https://student-progress-manager-2.onrender.com/api/students/${student._id}/reminder`,
         { method: 'PATCH', headers: { 'Content-Type': 'application/json' } }
       );
       if (res.ok) {
@@ -204,11 +205,11 @@ export default function StudentDetail() {
           <p style={labelStyle}>
             <b>CF Handle:</b>{" "}
             <a
-              href={`https://codeforces.com/profile/${student.codeforcesHandle}`}
+              href={`${student.codeforcesHandle}`}
               style={{ color: "#8db9fa", textDecoration: "underline", wordBreak: "break-all" }}
               target="_blank" rel="noreferrer"
             >
-              https://codeforces.com/profile/{student.codeforcesHandle}
+             {student.codeforcesHandle}
             </a>
           </p>
           <div style={{ margin: "12px 0" }}>
@@ -236,7 +237,8 @@ export default function StudentDetail() {
               }}
               onClick={async () => {
                 if (window.confirm("Reset reminder email count for this student?")) {
-                  await fetch(`http://localhost:5000/api/students/${student._id}/reset-reminder`, { method: "PATCH" });
+                  await fetch(`https://student-progress-manager-2.onrender.com/api/students/${student._id}/reset-reminder`, 
+                    { method: "PATCH" });
                   fetchStudent();
                 }
               }}
@@ -257,7 +259,7 @@ export default function StudentDetail() {
               onChange={async (e) => {
                 const hour = Number(e.target.value);
                 const res = await fetch(
-                  `http://localhost:5000/api/students/${student._id}/sync-hour`,
+                  `https://student-progress-manager-2.onrender.com/api/students/${student._id}/sync-hour`,
                   {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },

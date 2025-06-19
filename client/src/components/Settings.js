@@ -6,14 +6,14 @@ export default function Settings() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/students/sync-cron')
+    fetch('https://student-progress-manager-2.onrender.com/api/students/sync-cron')
       .then(res => res.json())
       .then(data => { setCron(data.value); setInput(data.value); });
   }, []);
 
   const handleSave = async () => {
     if (!input) return setMsg("Please enter a value.");
-    const res = await fetch('http://localhost:5000/api/students/sync-cron', {
+    const res = await fetch('https://student-progress-manager-2.onrender.com/api/students/sync-cron', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ value: input })
