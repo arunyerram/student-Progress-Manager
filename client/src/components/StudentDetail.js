@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, ResponsiveContainer
 } from 'recharts';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -19,34 +20,37 @@ const cardStyle = {
 };
 
 const sectionStyle = { margin: "2rem 0" };
-const labelStyle = { fontWeight: 500, marginRight: 8 };
+const labelStyle  = { fontWeight: 500, marginRight: 8 };
 
 export default function StudentDetail() {
   const { id } = useParams();
 
-  // STATE
-  const [student, setStudent]   = useState(null);
-  const [contests, setContests] = useState([]);
-  const [problems, setProblems] = useState([]);
-  const [mostDifficult, setMostDifficult] = useState(null);
+  // === STATE ===
+  const [student, setStudent]            = useState(null);
+  const [contests, setContests]          = useState([]);
+  const [problems, setProblems]          = useState([]);
+  const [mostDifficult, setMostDifficult]= useState(null);
 
-  const [contestDays, setContestDays] = useState(365);
-  const [problemDays, setProblemDays] = useState(90);
-  const [loading, setLoading]         = useState(true);
-  const [syncing, setSyncing]         = useState(false);
-  const [error, setError]             = useState(null);
+  const [contestDays, setContestDays]    = useState(365);
+  const [problemDays, setProblemDays]    = useState(90);
+  const [loading, setLoading]            = useState(true);
+  const [syncing, setSyncing]            = useState(false);
+  const [error, setError]                = useState(null);
 
-  // For reminder toggle UX
+  // For reminder-toggle UX
   const [reminderLoading, setReminderLoading] = useState(false);
 
-  // Fetch a single student (for reset count)
+  // --- Single student fetch (for reset count) ---
   async function fetchStudent() {
-    const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}`);
+    const res = await fetch(
+      `https://student-progress-manager-2.onrender.com/api/students/${id}`
+    );
     if (res.ok) setStudent(await res.json());
   }
 
-  // Main loader (student + contests + problems)
-  const loadAll = async () => {
+  // --- Main loader (student + contests + problems)
+  // ★  useCallback keeps the function identity stable
+  const loadAll = useCallback(async () => {
     setError(null);
     setLoading(true);
     try {
@@ -55,10 +59,13 @@ export default function StudentDetail() {
         fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/contests?days=${contestDays}`),
         fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/problems?days=${problemDays}`)
       ]);
+
       if (!stuRes.ok) throw new Error('Failed to fetch student');
+
       const stuJson  = await stuRes.json();
-      const contJson = contRes.ok  ? await contRes.json()  : [];
-      const probJson = probRes.ok  ? await probRes.json()  : [];
+      const contJson = contRes.ok ? await contRes.json() : [];
+      const probJson = probRes.ok ? await probRes.json() : [];
+
       setStudent(stuJson);
       setContests(contJson);
       setProblems(probJson);
@@ -67,42 +74,48 @@ export default function StudentDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, contestDays, problemDays]); // dependencies relevant to fetch URLs
 
-  // Initial load (on ID change)
-  useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [id]);
+  // --- Initial load & on-ID change ---
+  useEffect(() => {
+    loadAll();
+  }, [id, loadAll]); // ★ loadAll added here
 
-  // Re-fetch contests/problems on filter change
+  // --- Re-fetch contests on filter change ---
   useEffect(() => {
     if (!student) return;
     fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/contests?days=${contestDays}`)
-      .then(r => r.ok ? r.json() : [])
+      .then(r => (r.ok ? r.json() : []))
       .then(setContests)
       .catch(console.error);
   }, [contestDays, id, student]);
 
+  // --- Re-fetch problems on filter change ---
   useEffect(() => {
     if (!student) return;
     fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/problems?days=${problemDays}`)
-      .then(r => r.ok ? r.json() : [])
+      .then(r => (r.ok ? r.json() : []))
       .then(setProblems)
       .catch(console.error);
   }, [problemDays, id, student]);
 
-  // Fetch most difficult problem
+  // --- Fetch most difficult problem ---
   useEffect(() => {
-   fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/most-difficult-problem?days=90`)
+    fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/most-difficult-problem?days=90`)
       .then(r => r.json())
       .then(setMostDifficult)
       .catch(() => setMostDifficult(null));
   }, [id]);
 
-  // Handler: manual sync
+  // --- Handler: manual sync ---
   const handleSync = async () => {
     setSyncing(true);
     try {
-      const res = await fetch(`https://student-progress-manager-2.onrender.com/api/students/${id}/sync`,
-         { method: 'POST' });
+      const res = await fetch(
+        `https://student-progress-manager-2.onrender.com/api/students/${id}/sync`,
+        { method: 'POST' }
+      );
       if (!res.ok) throw new Error('Sync failed');
       await loadAll();
     } catch (e) {
@@ -112,12 +125,12 @@ export default function StudentDetail() {
     }
   };
 
-  // Handler: toggle reminderEnabled
+  // --- Handler: toggle reminder flag ---
   const handleToggleReminder = async () => {
     setReminderLoading(true);
     try {
       const res = await fetch(
-       `https://student-progress-manager-2.onrender.com/api/students/${student._id}/reminder`,
+        `https://student-progress-manager-2.onrender.com/api/students/${student._id}/reminder`,
         { method: 'PATCH', headers: { 'Content-Type': 'application/json' } }
       );
       if (res.ok) {
@@ -130,43 +143,58 @@ export default function StudentDetail() {
     setReminderLoading(false);
   };
 
-  // === Calculate statistics and chart data ===
+  // === Derived statistics & chart data ===
   const avgRating =
     problems.length
-      ? Math.round(problems.reduce((sum,p)=>sum+(p.rating||0),0)/problems.length)
+      ? Math.round(
+          problems.reduce((sum, p) => sum + (p.rating || 0), 0) / problems.length
+        )
       : 0;
-  const minR=800, maxR=3500, step=200;
+
+  const minR = 800,
+        maxR = 3500,
+        step = 200;
+
   const buckets = {};
-  for(let r=minR; r<=maxR; r+=step) buckets[`${r}-${r+step-1}`] = 0;
+  for (let r = minR; r <= maxR; r += step)
+    buckets[`${r}-${r + step - 1}`] = 0;
+
   problems.forEach(p => {
-    if(p.rating){
-      const start = Math.floor((p.rating-minR)/step)*step+minR;
-      const label = `${start}-${start+step-1}`;
-      if(buckets[label]!==undefined) buckets[label]++;
+    if (p.rating) {
+      const start = Math.floor((p.rating - minR) / step) * step + minR;
+      const label = `${start}-${start + step - 1}`;
+      if (buckets[label] !== undefined) buckets[label]++;
     }
   });
-  const barData = Object.entries(buckets).map(([bucket,count])=>({bucket,count}));
-  // Heatmap
+
+  const barData = Object.entries(buckets).map(([bucket, count]) => ({
+    bucket,
+    count
+  }));
+
+  // --- Heatmap data ---
   const dateCounts = {};
   problems.forEach(p => {
-    if(p.solvedAt){
-      const key = new Date(p.solvedAt).toISOString().slice(0,10);
-      dateCounts[key] = (dateCounts[key]||0)+1;
+    if (p.solvedAt) {
+      const key = new Date(p.solvedAt).toISOString().slice(0, 10);
+      dateCounts[key] = (dateCounts[key] || 0) + 1;
     }
   });
-  const today = new Date();
+
+  const today     = new Date();
   const startDate = new Date(today);
-  startDate.setDate(today.getDate()-problemDays+1);
+  startDate.setDate(today.getDate() - problemDays + 1);
+
   const heatmapData = [];
-  for(let d=new Date(startDate); d<=today; d.setDate(d.getDate()+1)){
-    const key = d.toISOString().slice(0,10);
-    heatmapData.push({date:key,count:dateCounts[key]||0});
+  for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+    const key = d.toISOString().slice(0, 10);
+    heatmapData.push({ date: key, count: dateCounts[key] || 0 });
   }
 
   // === Render ===
-  if (loading) return <p style={{ color: "#eee" }}>Loading…</p>;
-  if (error)   return <p style={{ color: "red" }}>{error}</p>;
-  if (!student) return <p>Student not found</p>;
+  if (loading)      return <p style={{ color: "#eee" }}>Loading…</p>;
+  if (error)        return <p style={{ color: "red" }}>{error}</p>;
+  if (!student)     return <p>Student not found</p>;
 
   return (
     <div style={cardStyle}>
@@ -209,9 +237,11 @@ export default function StudentDetail() {
               style={{ color: "#8db9fa", textDecoration: "underline", wordBreak: "break-all" }}
               target="_blank" rel="noreferrer"
             >
-             {student.codeforcesHandle}
+              {student.codeforcesHandle}
             </a>
           </p>
+
+          {/* Reminder-related controls */}
           <div style={{ margin: "12px 0" }}>
             <b>Reminder Emails Sent:</b> {student.reminderSentCount || 0}
             <label style={{ marginLeft: 18, cursor: "pointer", fontWeight: 500 }}>
@@ -237,8 +267,10 @@ export default function StudentDetail() {
               }}
               onClick={async () => {
                 if (window.confirm("Reset reminder email count for this student?")) {
-                  await fetch(`https://student-progress-manager-2.onrender.com/api/students/${student._id}/reset-reminder`, 
-                    { method: "PATCH" });
+                  await fetch(
+                    `https://student-progress-manager-2.onrender.com/api/students/${student._id}/reset-reminder`,
+                    { method: "PATCH" }
+                  );
                   fetchStudent();
                 }
               }}
@@ -247,7 +279,8 @@ export default function StudentDetail() {
               Reset
             </button>
           </div>
-          {/* Sync hour selector */}
+
+          {/* Sync-hour selector */}
           <div style={{ margin: '12px 0' }}>
             <b>Data Sync Time:</b>
             <span style={{ marginLeft: 8 }}>
@@ -258,7 +291,7 @@ export default function StudentDetail() {
               style={{ marginLeft: 10, padding: "3px 8px" }}
               onChange={async (e) => {
                 const hour = Number(e.target.value);
-                const res = await fetch(
+                const res  = await fetch(
                   `https://student-progress-manager-2.onrender.com/api/students/${student._id}/sync-hour`,
                   {
                     method: "PATCH",
@@ -280,7 +313,7 @@ export default function StudentDetail() {
         </div>
       </div>
 
-      {/* Most Difficult Problem */}
+      {/* === Most Difficult Problem === */}
       <div style={sectionStyle}>
         <b>Most Difficult Problem Solved (last 90 days):</b><br />
         {mostDifficult ? (
@@ -299,7 +332,7 @@ export default function StudentDetail() {
 
       <hr style={{ border: "1px solid #333" }} />
 
-      {/* Contest History Section */}
+      {/* === Contest History === */}
       <section style={sectionStyle}>
         <h3 style={{ marginBottom: 14, fontWeight: 700 }}>Contest History</h3>
         <label style={labelStyle}>Show last: </label>
@@ -312,6 +345,7 @@ export default function StudentDetail() {
           <option value={90}>90 days</option>
           <option value={365}>365 days</option>
         </select>
+
         <ResponsiveContainer width="100%" height={320}>
           <LineChart
             data={contests.map(c => ({
@@ -363,7 +397,7 @@ export default function StudentDetail() {
 
       <hr style={{ border: "1px solid #333" }} />
 
-      {/* Problem Solving Section */}
+      {/* === Problem-Solving Section === */}
       <section style={sectionStyle}>
         <h3 style={{ marginBottom: 14, fontWeight: 700 }}>Problem Solving Data</h3>
         <label style={labelStyle}>Show last: </label>
@@ -409,7 +443,9 @@ export default function StudentDetail() {
               if (v.count < 7)      return 'color-github-3';
               return 'color-github-4';
             }}
-            tooltipDataAttrs={v => v.date ? { 'data-tip': `${v.date}: ${v.count} solved` } : {}}
+            tooltipDataAttrs={v =>
+              v.date ? { 'data-tip': `${v.date}: ${v.count} solved` } : {}
+            }
             showWeekdayLabels
           />
         </div>
@@ -443,10 +479,11 @@ export default function StudentDetail() {
       </section>
 
       <p style={{ marginTop: '1.7rem', fontWeight: 600 }}>
-        <Link to="/" style={{ color: "#8db9fa", textDecoration: "underline" }}>← Back to list</Link>
+        <Link to="/" style={{ color: "#8db9fa", textDecoration: "underline" }}>
+          ← Back to list
+        </Link>
       </p>
     </div>
   );
 }
-
 
